@@ -19,16 +19,36 @@ def create_flask_app(agent, port):
         return jsonify({'success': True, 'message': 'Training step completed'}), 200
     
 
+    # @app.route('/store_states', methods=['POST'])
+    # def store_states():
+    #     data = request.get_json()
+    #     state = data.get('state')
+    #     action = data.get('action') 
+    #     reward = data.get('reward')
+    #     next_state = data.get('next_state')
+    #     agent.remember(state, action, reward, next_state, port)
+    #     return jsonify({'success': True, 'message': 'Training step completed'}), 200
+    
     @app.route('/store_states', methods=['POST'])
     def store_states():
-        data = request.get_json()
-        state = data.get('state')
-        action = data.get('action') 
-        reward = data.get('reward')
-        next_state = data.get('next_state')
-        agent.remember(state, action, reward, next_state, port)
-        return jsonify({'success': True, 'message': 'Training step completed'}), 200
+        data       = request.get_json()
+        state      = data.get('state')
+        action     = data.get('action')
+        reward     = data.get('reward')
+        next_state = data.get('next_state')   # kept for compat, PPO ignores it
+        log_prob   = data.get('log_prob')     # NEW
+        value      = data.get('value')        # NEW
+        agent.remember(state, action, reward, next_state, log_prob, value, port)
+        return jsonify({'success': True}), 200
 
+    # @app.route('/train_now', methods=['POST'])
+    # def trigger_train():
+    #     def run_training():
+    #         print("training started")
+    #         agent.train(port)
+    #         print("training finished")
+    #     Thread(target=run_training).start()
+    #     return jsonify({"status": "training_started"})
     @app.route('/train_now', methods=['POST'])
     def trigger_train():
         def run_training():
@@ -38,12 +58,19 @@ def create_flask_app(agent, port):
         Thread(target=run_training).start()
         return jsonify({"status": "training_started"})
 
+    # @app.route('/select_action', methods=['POST'])
+    # def select_action():
+    #     data = request.get_json()
+    #     state = data.get('state') 
+    #     action = agent.act(state)
+    #     return jsonify({'action': action}), 200
     @app.route('/select_action', methods=['POST'])
     def select_action():
-        data = request.get_json()
-        state = data.get('state') 
-        action = agent.act(state)
-        return jsonify({'action': action}), 200
+        data   = request.get_json()
+        state  = data.get('state')
+        action, log_prob, value = agent.act(state)
+        # Java must store log_prob + value and send them back in /store_states
+        return jsonify({'action': action, 'log_prob': log_prob, 'value': value}), 200
 
     @app.route('/long_term_reward', methods=['POST'])
     def long_term_reward():

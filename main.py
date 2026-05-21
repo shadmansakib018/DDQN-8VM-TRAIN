@@ -4,6 +4,8 @@ import threading
 import subprocess
 import time
 
+from ppo_model import PPOAgent
+
 NUM_INSTANCES = 1
 BASE_PORT = 6000
 batch_size = 50
@@ -12,7 +14,8 @@ epochs = 2000
 MODEL_PATH = "C:/Users/ss4587s/Desktop"
 jar_path = "DDQN_TRAIN_8VM.jar"
 
-agent = DQNAgent(MODEL_PATH+"/checkpoint_step_5200.pth")
+# agent = DQNAgent(MODEL_PATH+"/checkpoint_step_5200.pth")
+agent = PPOAgent("./checkpoint_step_3200.pth")
 
 fallback_app = create_flask_app(agent, BASE_PORT)
 

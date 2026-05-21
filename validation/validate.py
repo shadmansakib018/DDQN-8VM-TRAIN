@@ -6,12 +6,14 @@ import time
 import sys
 import os
 
+from ppo_model import PPOAgent
+
 # --- Configuration ---
 checkpoint_path = sys.argv[1]  # path passed from main.py
 BASE_PORT = 3000
 # jar_path = "DDQN_VALIDATE.jar"
-jar_path = os.path.join(os.path.dirname(__file__), "DDQN_VALIDATE_8VM.jar")
-num_epochs = 40
+jar_path = os.path.join(os.path.dirname(__file__), "PPO_VALIDATE_8VM.jar")
+num_epochs = 50
 batch_size = 50
 lb = 4
 
@@ -19,7 +21,8 @@ avg_file = os.path.join(os.path.dirname(__file__), "ValidationART.txt")
 best_file =  os.path.join(os.path.dirname(__file__), "best_model.txt")
 
 # --- Load Model ---
-agent = DQNAgent(checkpoint_path)
+# agent = DQNAgent(checkpoint_path)
+agent = PPOAgent(checkpoint_path)
 
 # --- Start Flask Server ---
 app = create_flask_app(agent, BASE_PORT)
@@ -39,10 +42,20 @@ proc.wait()
 
 print("✅ Validation Complete")
 
-# --- Read Result ---
+# --- Read Result --- for DDQN
+# try:
+#     with open(avg_file, "r") as f:
+#         avg_response_time = float(f.read().strip())
+# except Exception as e:
+#     print(f"⚠️ Error reading {avg_file}: {e}")
+#     sys.exit(1)
+
+# --- Read Result --- for PPO validate
 try:
     with open(avg_file, "r") as f:
-        avg_response_time = float(f.read().strip())
+        lines = f.read().splitlines()
+        lines = [l for l in lines if l.strip()]  # ignore empty lines
+        avg_response_time = float(lines[-1])      # always grab the latest
 except Exception as e:
     print(f"⚠️ Error reading {avg_file}: {e}")
     sys.exit(1)

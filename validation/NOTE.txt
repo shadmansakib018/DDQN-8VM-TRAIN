@@ -1,0 +1,1 @@
+Remember to change the write path of the validation results. right now its at String folderPath = System.getProperty("user.home") + "/Desktop/DDQN-8VM-TRAIN/validation";

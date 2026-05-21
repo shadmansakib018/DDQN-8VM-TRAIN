@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
 import logging
+import os
+import signal
 
 def create_flask_app(agent, port):
     app = Flask(__name__)
@@ -15,10 +17,7 @@ def create_flask_app(agent, port):
     
     @app.route('/shutdown', methods=['POST'])
     def shutdown():
-        shutdown_func = request.environ.get('werkzeug.server.shutdown')
-        if shutdown_func is None:
-            raise RuntimeError('Not running with the Werkzeug Server')
-        shutdown_func()
+        os.kill(os.getpid(), signal.SIGTERM)
         return 'Server shutting down...'
 
     return app
