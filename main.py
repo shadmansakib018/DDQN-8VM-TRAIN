@@ -12,7 +12,7 @@ batch_size = 50
 lb_type = 4
 epochs = 2000
 MODEL_PATH = "C:/Users/ss4587s/Desktop"
-jar_path = "DDQN_TRAIN_8VM.jar"
+jar_path = "PPO_TRAIN_8VM.jar"
 
 # agent = DQNAgent(MODEL_PATH+"/checkpoint_step_5200.pth")
 agent = PPOAgent("./checkpoint_step_3200.pth")
